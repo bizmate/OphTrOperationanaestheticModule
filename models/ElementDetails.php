@@ -25,7 +25,7 @@
  * The followings are the available model relations:
  * @property Event $event
  */
-class ElementExample extends BaseEventTypeElement
+class ElementDetails extends BaseEventTypeElement
 {
 	/**
 	 * Returns the static model of the specified AR class.
@@ -41,7 +41,7 @@ class ElementExample extends BaseEventTypeElement
 	 */
 	public function tableName()
 	{
-		return 'example_element';
+		return 'et_ophtroperationanaesthetic_details';
 	}
 
 	/**
@@ -52,11 +52,11 @@ class ElementExample extends BaseEventTypeElement
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('event_id', 'safe'),
-			//array('', 'required'),
+			array('event_id, anaesthetist_id, comments', 'safe'),
+			array('anaesthetist_id, comments', 'required'),
 			// The following rule is used by search().
 			// Please remove those attributes that should not be searched.
-			array('id, event_id', 'safe', 'on' => 'search'),
+			array('id, event_id, anaesthetist_id, comments', 'safe', 'on' => 'search'),
 		);
 	}
 
@@ -73,6 +73,7 @@ class ElementExample extends BaseEventTypeElement
 			'event' => array(self::BELONGS_TO, 'Event', 'event_id'),
 			'user' => array(self::BELONGS_TO, 'User', 'created_user_id'),
 			'usermodified' => array(self::BELONGS_TO, 'User', 'last_modified_user_id'),
+            'anaesthetist' => array(self::BELONGS_TO, 'User', 'anaesthetist_id'),
 		);
 	}
 
@@ -82,6 +83,8 @@ class ElementExample extends BaseEventTypeElement
 	public function attributeLabels()
 	{
 		return array(
+            'anaesthetist_id' => 'Anaesthetist',
+            'comments' => 'Comments',
 		);
 	}
 
@@ -103,4 +106,17 @@ class ElementExample extends BaseEventTypeElement
 			'criteria' => $criteria,
 		));
 	}
+
+    /**
+     * retrieves list of anaesthetists
+     * @return Users
+     */
+
+    public function getAnaesthetist_list() {
+        $criteria = new CDbCriteria;
+        $criteria->compare('is_doctor',1);
+        $criteria->order = 'first_name,last_name asc';
+
+        return User::model()->findAll($criteria);
+    }
 }
